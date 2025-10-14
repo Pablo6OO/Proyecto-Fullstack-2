@@ -1,7 +1,7 @@
 import React from 'react'; // Es buena práctica siempre importar React
 
 // 1. El nombre del componente y la función DEBEN empezar con mayúscula (PascalCase)
-function inicio() {
+function Inicio() {
   // 2. El return debe estar dentro de la función del componente
   return (
     <div className="container"> {/* Envolvemos todo en un solo elemento padre */}
@@ -61,9 +61,14 @@ function inicio() {
           <button type="submit" className="btn">Enviar Reseña</button>
         </form>
       </div>
+      <section className="footer">
+        <div className="container">
+            <p>&copy; 2025 Tienda Pato Feliz. DuocUc.</p>
+        </div>
+    </section>
     </div>
   );
 }
 
 // 3. ¡Muy importante! Debemos exportar el componente para poder usarlo en otros archivos
-export default inicio;
+export default Inicio;

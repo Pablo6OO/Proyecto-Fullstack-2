@@ -30,10 +30,11 @@ function Header() {
           <Link to="/admin">Admin</Link>
           <Link to="/login">Iniciar sesion</Link>
           <Link to="/registro">Registro</Link>
-          <Link to="/carrito">Carrito</Link>
+          <Link to="/Carrito">Carrito</Link>
         </nav>
       </div>
     </header>
+    
   );
 }
 

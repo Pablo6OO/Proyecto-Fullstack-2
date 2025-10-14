@@ -2,12 +2,12 @@
 import React from 'react'; // Es buena práctica siempre importar React
 
 // 1. El nombre del componente y la función DEBEN empezar con mayúscula (PascalCase)
-function Carrito() {
+function carrito() {
   // 2. El return debe estar dentro de la función del componente
   return (
     <div className="container"> {/* Envolvemos todo en un solo elemento padre */}
-      <section className="hero">
-        <h1>Bienvenido a nuestra tienda</h1>
+        <section className="hero">
+            <h1>Bienvenido a nuestra tienda</h1>
         <p>Productos de calidad para tu día a día.</p>
       </section>
 
@@ -67,4 +67,4 @@ function Carrito() {
 }
 
 // 3. ¡Muy importante! Debemos exportar el componente para poder usarlo en otros archivos
-export default Carrito;
+export default carrito;

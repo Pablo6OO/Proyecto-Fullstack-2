@@ -5,8 +5,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // 1. Importamos los componentes con su nombre en PascalCase
 import Header from './components/Header';
-import Carrito from './components/carrito'; // <-- CAMBIO: Nombre en mayúscula
-import inicio from './components/Inicio';
+import Carrito from './components/carrito'; 
+import footer from './components/Footer';
+import Inicio from './components/Inicio';
 
 function App() {
   return (
@@ -17,8 +18,8 @@ function App() {
         <main>
           <Routes>
             {/* 2. Usamos el componente con su nombre en PascalCase */}
-            <Route path="/" element={<Carrito />} />
-            <Route path="/" element={<inicio/>}/>
+            <Route path="/Carrito" element={<Carrito />} />
+            <Route path="/" element={<Inicio />}/>
             {/* Aquí puedes agregar más rutas en el futuro, por ejemplo: */}
             {/* <Route path="/contacto" element={<PaginaDeContacto />} /> */}
           </Routes>
