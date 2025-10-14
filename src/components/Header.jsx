@@ -1,23 +1,40 @@
-import React from "react";
+import React, { useRef } from 'react';
+// 1. Importamos 'Link' para manejar la navegación
+import { Link } from 'react-router-dom';
 
- function Header (){
-    return( <header class="header">
-        <div className="container">
-              <a href="main.html" class="logo">Tienda Pato feliz</a>
-            <img src="images/120px-Unused_Duck_Journal.png" alt="Logo" class="logo-image"
-            onclick="document.getElementById('logo-click').play()"/>
-            <audio id="logo-click" src="audio/Bumper_car_quack1.wav"></audio> 
-            <nav>
-         <a href="main.html" id="login-link">Inicio</a>
-            <a href="admin.html" id="admin-link">Admin</a>
-                <a href="index.html">Iniciar sesion</a>
-                <a href="registro.html" id="register-link">Registro</a>
-                <a href="carrito.html">Carrito</a>
-             
-               
-            </nav>
-        </div>
+function Header() {
+  
+  const audioRef = useRef(null);
+
+  const handleLogoClick = () => {
+    if (audioRef.current) {
+      audioRef.current.play();
+    }
+  };
+
+  return (
+    <header className="header">
+      <div className="container">
+        <Link to="/" className="logo">Tienda Pato feliz</Link>
+        <img
+          src="src/images/120px-Unused_Duck_Journal.png" 
+          alt="Logo"
+          className="logo-image"
+          onClick={handleLogoClick} 
+        />
+        <audio ref={audioRef} id="logo-click" src="src/audio/Bumper_car_quack1.wav"></audio>
+
+        <nav>
+          {/* 3. Reemplazamos todas las etiquetas <a> por <Link> */}
+          <Link to="/">Inicio</Link>
+          <Link to="/admin">Admin</Link>
+          <Link to="/login">Iniciar sesion</Link>
+          <Link to="/registro">Registro</Link>
+          <Link to="/carrito">Carrito</Link>
+        </nav>
+      </div>
     </header>
-    );
- }
- export default Header;
+  );
+}
+
+export default Header;
