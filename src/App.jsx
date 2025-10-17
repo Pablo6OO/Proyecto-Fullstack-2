@@ -3,25 +3,26 @@ import './App.css';
 import './style.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// 1. Importamos los componentes con su nombre en PascalCase
 import Header from './components/Header';
-import Carrito from './components/carrito'; 
+import Login from './components/login';
+import Admin from './components/admin';
+import Carrito from './components/carrito';
+import Registro from './components/registro'; 
 import footer from './components/Footer';
 import Inicio from './components/Inicio';
 
 function App() {
   return (
-    // BrowserRouter debe envolver toda la aplicación
     <BrowserRouter>
       <div>
         <Header />
         <main>
           <Routes>
-            {/* 2. Usamos el componente con su nombre en PascalCase */}
-            <Route path="/Carrito" element={<Carrito />} />
+            <Route path="/login" element={<Login/>}/>
+            <Route path="/admin" element={<Admin/>}/>
+            <Route path="/registro" element={<Registro/>}/>
+            <Route path="/carrito" element={<Carrito />} />
             <Route path="/" element={<Inicio />}/>
-            {/* Aquí puedes agregar más rutas en el futuro, por ejemplo: */}
-            {/* <Route path="/contacto" element={<PaginaDeContacto />} /> */}
           </Routes>
         </main>
       </div>

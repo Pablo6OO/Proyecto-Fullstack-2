@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-// 1. Importamos 'Link' para manejar la navegación
 import { Link } from 'react-router-dom';
 
 function Header() {
@@ -25,7 +24,6 @@ function Header() {
         <audio ref={audioRef} id="logo-click" src="src/audio/Bumper_car_quack1.wav"></audio>
 
         <nav>
-          {/* 3. Reemplazamos todas las etiquetas <a> por <Link> */}
           <Link to="/">Inicio</Link>
           <Link to="/admin">Admin</Link>
           <Link to="/login">Iniciar sesion</Link>
