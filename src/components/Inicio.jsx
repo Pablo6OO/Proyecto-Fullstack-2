@@ -1,5 +1,41 @@
 import React from 'react';
+import ProductCard from './ProductCard';
 
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "Taza de gato negro",
+    price: 2990,
+    priceFormatted: "$2.990",
+    description: "Taza de gato negro",
+    image: "taza1.jpg",
+    reviewAuthor: "Juan Rodríguez",
+    reviewComment: "Buena taza, aunque un poco más pequeña de lo que esperaba. Cumple su función.",
+    reviewRating: 4,
+  },
+  {
+    id: 2,
+    name: "Hervidor generico",
+    price: 12500,
+    priceFormatted: "$12.500",
+    description: "hervidor de agua generico y economico",
+    image: "hervidor1.webp",
+    reviewAuthor: "Juan Rodríguez",
+    reviewComment: "buen hervidor cumple su funcion",
+    reviewRating: 4,
+  },
+  {
+    id: 3,
+    name: "Mouse Inalambrico",
+    price: 20000,
+    priceFormatted: "$20.000",
+    description: "Mouse inalambrico con buena precision",
+    image: "mouse.webp",
+    reviewAuthor: null,
+    reviewComment: null,
+    reviewRating: 0,
+  }
+];
 function Inicio() {
   return (
     <div className="container">
@@ -11,6 +47,9 @@ function Inicio() {
       <section className="product-grid">
         <h2>Nuestros Productos</h2>
         <div className="products-container">
+          {PRODUCTS.map(product => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
       </section>
 
@@ -68,3 +107,4 @@ function Inicio() {
 }
 
 export default Inicio;
+export { PRODUCTS };
