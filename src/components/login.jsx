@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 function login() {
   return (
     <section className="container">
@@ -12,8 +14,9 @@ function login() {
             <label for="password">Contraseña</label>
             <input type="password" id="password" placeholder="Contraseña" name="password" onChange={(e) => setIdentifier(e.target.value)} />
           </div>
-          <button type="submit" class="btn">Registrarse</button>
-          <a href="registro.jsx">¿No tienes una cuenta? Regístrate</a>
+          <button type="submit" class="btn">Iniciar Sesión</button>
+
+          <h4>¿No tienes una cuenta? <Link to="/registro">Regístrate</Link></h4>
         </form>
       </section>
     </section>
