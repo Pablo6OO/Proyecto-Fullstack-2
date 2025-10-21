@@ -1,6 +1,6 @@
 function footer(){
-return <footer class="footer">
-        <div class="container">
+return <footer className="footer">
+        <div className="container">
             <p>&copy; 2025 Tienda Pato Feliz. DuocUc.</p>
         </div>
     </footer>

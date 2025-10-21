@@ -7,12 +7,15 @@ import Login from './components/login';
 import Admin from './components/admin';
 import Carrito from './components/carrito';
 import Registro from './components/registro'; 
-import footer from './components/Footer';
+import Footer from './components/Footer';
 import Inicio from './components/Inicio';
 import ProductDetail from './components/productdetail';
+import { CartProvider } from './context/CartProvider';
 
 function App() {
   return (
+    <CartProvider>
+      <div className='app-layout'></div>
     <BrowserRouter>
       <div>
         <Header />
@@ -24,10 +27,13 @@ function App() {
             <Route path="/carrito" element={<Carrito />} />
             <Route path="/" element={<Inicio />}/>
             <Route path="/producto/:id" element={<ProductDetail />} />
+            
             </Routes>
         </main>
+        <Footer/>
       </div>
     </BrowserRouter>
+    </CartProvider>
   );
 }
 

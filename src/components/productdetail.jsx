@@ -1,12 +1,15 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PRODUCTS } from './Inicio';
+import carrito from './carrito';
 import ReviewForm from './ReviewForm';
+import { useCart } from '../context/CartProvider';
 
 function ProductDetail() {
   const { id } = useParams();
   const productId = parseInt(id);
   const product = PRODUCTS.find(p => p.id === productId);
+  const { addItem } = useCart()
 
   if (!product) {
     return (
@@ -29,7 +32,13 @@ function ProductDetail() {
     }
     return <div className="review-rating">{stars}</div>;
   };
-
+    const handleAddToCart = () => {
+    // Asumimos que quieres agregar 1 unidad
+    // ¡¡IMPORTANTE!! Asegúrate de que 'product' tenga 'price' como NÚMERO
+    // Si 'PRODUCTS' solo tiene 'priceFormatted', deberás agregar 'price' con el número.
+    addItem(product, 1);
+    alert('¡Producto agregado al carrito!');
+  };
   return (
     <div className="container">
       <div className="product-detail">
@@ -40,8 +49,11 @@ function ProductDetail() {
           <h1>{product.name}</h1>
           <p className="price"><strong>{product.priceFormatted}</strong></p>
           <p className="description">{product.description}</p>
-          <button className="btn add-to-cart-btn" data-product-id={product.id}>
-            Añadir al Carrito
+          
+          <button 
+            className="btn add-to-cart-btn" 
+            onClick={handleAddToCart} // <-- Añade el onClick
+          >Añadir al carrito
           </button>
         </div>
       </div>
