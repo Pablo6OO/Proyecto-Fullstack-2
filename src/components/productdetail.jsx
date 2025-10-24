@@ -33,10 +33,8 @@ function ProductDetail() {
     return <div className="review-rating">{stars}</div>;
   };
     const handleAddToCart = () => {
-    // Asumimos que quieres agregar 1 unidad
-    // ¡¡IMPORTANTE!! Asegúrate de que 'product' tenga 'price' como NÚMERO
-    // Si 'PRODUCTS' solo tiene 'priceFormatted', deberás agregar 'price' con el número.
-    addItem(product, 1);
+  
+      addItem(product, 1);
     alert('¡Producto agregado al carrito!');
   };
   return (
@@ -52,7 +50,7 @@ function ProductDetail() {
           
           <button 
             className="btn add-to-cart-btn" 
-            onClick={handleAddToCart} // <-- Añade el onClick
+            onClick={handleAddToCart} 
           >Añadir al carrito
           </button>
         </div>

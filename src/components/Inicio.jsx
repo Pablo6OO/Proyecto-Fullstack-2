@@ -1,5 +1,6 @@
 import React from 'react';
 import ProductCard from './ProductCard';
+import Carrusel from './carrusel';
 
 const PRODUCTS = [
   {
@@ -34,6 +35,40 @@ const PRODUCTS = [
     reviewAuthor: null,
     reviewComment: null,
     reviewRating: 0,
+  },
+  {
+    id: 4,
+    name: "Tostador Manual",
+    price: 1900,
+    priceFormatted: "$1.900",
+    description: "Tostador manual para pan",
+    image: "tostador.webp",
+    reviewAuthor: null,
+    reviewComment: null,
+    reviewRating: 0,
+  }
+  ,
+  {
+    id: 5,
+    name: "USB Sandisk",
+    price: 5000,
+    priceFormatted: "$5.000",
+    description: "USB SanDisk de 64GB",
+    image: "usb.avif",
+    reviewAuthor: null,
+    reviewComment: null,
+    reviewRating: 0,
+  },
+    {
+    id: 5,
+    name: "Sanduchera Eléctrica",
+    price: 12000,
+    priceFormatted: "$12.000",
+    description: "sanduchera electrica para preparar ricos sándwiches",
+    image: "sandwich.webp",
+    reviewAuthor: null,
+    reviewComment: null,
+    reviewRating: 0,
   }
 ];
 function Inicio() {
@@ -44,7 +79,9 @@ function Inicio() {
         <p>Productos de calidad para tu día a día.</p>
       </section>
 
-      <section className="product-grid">
+        
+        <Carrusel products={PRODUCTS} />
+ <section className="product-grid">
         <h2>Nuestros Productos</h2>
         <div className="products-container">
           {PRODUCTS.map(product => (
@@ -52,6 +89,7 @@ function Inicio() {
           ))}
         </div>
       </section>
+
 
       <section className="product-reviews">
         <h2>Opiniones de Nuestros Clientes</h2>
@@ -68,11 +106,7 @@ function Inicio() {
         </div>
       </section>
 
-      <section className="About-us">
-        <h2>Sobre Nosotros</h2>
-        <p>En Tienda Pato Feliz, nos dedicamos a la venta de productos de calidad, para lograr una satisfaccion de nuestros clientes. Somos un proyecto academico de un estudiante de DuocUC</p>
-      </section>
-
+      
       <div className="review-form">
         <h3>Danos Tu Opinion</h3>
         <form id="new-review-form">
@@ -97,11 +131,7 @@ function Inicio() {
           <button type="submit" className="btn">Enviar Reseña</button>
         </form>
       </div>
-      <section className="footer">
-        <div className="container">
-            <p>&copy; 2025 Tienda Pato Feliz. DuocUc.</p>
-        </div>
-    </section>
+     
     </div>
   );
 }

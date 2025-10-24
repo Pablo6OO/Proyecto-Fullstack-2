@@ -1,4 +1,5 @@
 import React from 'react';
+import AboutUs from './components/AboutUs';
 import './App.css';
 import './style.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -34,6 +35,7 @@ function App() {
       </div>
     </BrowserRouter>
     </CartProvider>
+                // Comment removed
   );
 }
 

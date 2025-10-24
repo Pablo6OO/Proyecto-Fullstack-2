@@ -1,3 +1,25 @@
+
+.aboutus-logo{
+    border-radius: 10%;
+    
+}
+
+.aboutus-team {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 200px;
+    justify-content: left;
+    margin-top: 30px;
+    
+}
+.AboutUs-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
 :root {
     --primary-color: #3498db;
     --secondary-color: #2c3e50;
@@ -139,7 +161,7 @@ main {
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     
-    
+  
 }
 .product-card:hover {
     transform: translateY(-5px);

@@ -14,7 +14,7 @@ function Header() {
   return (
     <header className="header">
       <div className="container">
-        <Link to="/" className="logo">Tienda Pato feliz</Link>
+        <Link to="/" className="logo">Tienda Pato Feliz</Link>
         <img
           src="src/images/120px-Unused_Duck_Journal.png" 
           alt="Logo"
@@ -25,10 +25,10 @@ function Header() {
 
         <nav>
           <Link to="/">Inicio</Link>
-          <Link to="/admin">Admin</Link>
           <Link to="/login">Iniciar sesion</Link>
           <Link to="/registro">Registro</Link>
           <Link to="/Carrito">Carrito</Link>
+          <Link to="/aboutus">Sobre Nosotros</Link>
         </nav>
       </div>
     </header>

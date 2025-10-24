@@ -13,7 +13,7 @@ function ProductCard({ product }) {
     return <div className="review-rating">{stars}</div>;
   };
 return (
-    <article className="product-item">
+    <article className="product-card">
       <Link to={`/producto/${product.id}`} className="product-link"> 
         <div className="product-image">
           <img src={`src/images/${product.image}`} alt={product.name} />

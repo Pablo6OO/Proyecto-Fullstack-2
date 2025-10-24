@@ -1,7 +1,7 @@
 import React from 'react';
 import { useCart } from '../context/CartProvider';
 
-// Este componente recibe el 'item' del carrito como prop
+
 function ProductoCarrito({ item }) {
   const { removeItem } = useCart();
 
