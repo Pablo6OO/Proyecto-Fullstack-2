@@ -5,24 +5,28 @@ function registro() {
   const [password, setPassword] = useState("");
   const [valpass, setValPass] = useState("");
   const [error, setError] = useState("");
+  const [errorCorreo, setErrorCorreo] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setErrorCorreo("");
 
-  if (valpass !== password) {
-    setError("La contraseña debe ser igual en los dos campos");
-    return;
-  }
-
+    if (valpass !== password) {
+      setError("La contraseña debe ser igual en los dos campos");
+    }
+    
+    if (!(identifier.includes('@gmail.com'))) {
+      setErrorCorreo("Correo invalido, ingrese correo con '@gmail.com'");
+    }
   };
 
   return (
-    <div class="container">
-      <section class="form-section">
+    <div className="container">
+      <section className="form-section">
         <h1>Registro de Usuario</h1>
         <form onSubmit={handleLogin} novalidate>
-          <div class="form-group">
+          <div className="form-group">
             <label>Correo Electrónico</label>
             <input type="email"
                    placeholder="Correo usuario"
@@ -30,18 +34,19 @@ function registro() {
                    onChange={(e) => setIdentifier(e.target.value)}
                    required
             />
+            {errorCorreo && <p style={{ color: "red" }}>{errorCorreo}</p>}
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label>Contraseña</label>
             <input type="password"
                    placeholder="Contraseña"
                    value={password}
                    onChange={(e) => setPassword(e.target.value)}
                    required
-                   minlength="6"
+                   minlength="8"
             />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label>Confirmar Contraseña</label>
             <input type="password"
                    placeholder="Repita la Contraseña"
@@ -49,9 +54,9 @@ function registro() {
                    onChange={(e) => setValPass(e.target.value)}
                    required
             />
+            {error && <p style={{ color: "red" }}>{error}</p>}
           </div>
-          <button type="submit" class="btn">Registrarse</button>
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          <button type="submit" className="btn">Registrarse</button>
         </form>
       </section>
     </div>

@@ -54,4 +54,4 @@ function Carrito() { // Nota: Cambié 'carrito' a 'Carrito' (Mayúscula inicial)
   );
 }
 
-export default Carrito; // <-- Asegúrate de exportar con Mayúscula
+export default Carrito;
