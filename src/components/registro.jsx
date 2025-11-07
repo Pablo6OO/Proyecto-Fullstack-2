@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useAuth } from './registerUser';
+import { useNavigate } from "react-router-dom";
 
 function registro() {
   const [identifier, setIdentifier] = useState("");
@@ -6,6 +8,9 @@ function registro() {
   const [valpass, setValPass] = useState("");
   const [error, setError] = useState("");
   const [errorCorreo, setErrorCorreo] = useState("");
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -14,11 +19,28 @@ function registro() {
 
     if (valpass !== password) {
       setError("La contraseña debe ser igual en los dos campos");
+      return;
     }
     
     if (!(identifier.includes('@gmail.com'))) {
       setErrorCorreo("Correo invalido, ingrese correo con '@gmail.com'");
+      return;
     }
+
+    // 👇 INICIO DEL CÓDIGO A REEMPLAZAR O AGREGAR 👇
+    // 1. Crear el objeto con la información
+    const newUser = {
+      email: identifier,
+      password: password,
+    };
+
+    // 2. Llamar a setUser con UN SOLO argumento (el objeto newUser)
+    setUser(newUser); 
+    // 👆 FIN DEL CÓDIGO A REEMPLAZAR O AGREGAR 👆
+
+    alert('¡Registrado correctamente!');
+
+    navigate('/');
   };
 
   return (

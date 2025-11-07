@@ -12,29 +12,32 @@ import Footer from './components/Footer';
 import Inicio from './components/Inicio';
 import ProductDetail from './components/productdetail';
 import { CartProvider } from './context/CartProvider';
+import { AuthProvider } from './components/registerUser';
 
 function App() {
   return (
-    <CartProvider>
-      <div className='app-layout'></div>
-    <BrowserRouter>
-      <div>
-        <Header />
-        <main>
-          <Routes>
-            <Route path="/login" element={<Login/>}/>
-            <Route path="/admin" element={<Admin/>}/>
-            <Route path="/registro" element={<Registro/>}/>
-            <Route path="/carrito" element={<Carrito />} />
-            <Route path="/" element={<Inicio />}/>
-            <Route path="/producto/:id" element={<ProductDetail />} />
-            
+    <AuthProvider>
+      <CartProvider>
+        <div className='app-layout'></div>
+        <BrowserRouter>
+        <div>
+          <Header />
+          <main>
+            <Routes>
+              <Route path="/login" element={<Login/>}/>
+              <Route path="/admin" element={<Admin/>}/>
+              <Route path="/registro" element={<Registro/>}/>
+              <Route path="/carrito" element={<Carrito/>}/>
+              <Route path="/" element={<Inicio/>}/>
+              <Route path="/AboutUs" element={<AboutUs/>}/>
+              <Route path="/producto/:id" element={<ProductDetail/>}/>  
             </Routes>
-        </main>
-        <Footer/>
-      </div>
-    </BrowserRouter>
-    </CartProvider>
+          </main>
+          <Footer/>
+        </div>
+      </BrowserRouter>
+      </CartProvider>
+    </AuthProvider>
                 // Comment removed
   );
 }

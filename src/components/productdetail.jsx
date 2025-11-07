@@ -1,15 +1,18 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link , useNavigate } from 'react-router-dom';
 import { PRODUCTS } from './Inicio';
 import carrito from './carrito';
 import ReviewForm from './ReviewForm';
 import { useCart } from '../context/CartProvider';
+import { useAuth } from './registerUser';
 
 function ProductDetail() {
   const { id } = useParams();
   const productId = parseInt(id);
   const product = PRODUCTS.find(p => p.id === productId);
   const { addItem } = useCart()
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (!product) {
     return (
@@ -48,11 +51,19 @@ function ProductDetail() {
           <p className="price"><strong>{product.priceFormatted}</strong></p>
           <p className="description">{product.description}</p>
           
-          <button 
-            className="btn add-to-cart-btn" 
-            onClick={handleAddToCart} 
-          >Añadir al carrito
-          </button>
+          {user ? (
+            <>
+              <button 
+                className="btn add-to-cart-btn" 
+                onClick={handleAddToCart} 
+              >Añadir al carrito
+              </button>
+            </>
+          ) : (
+            <>
+              <h2>Debe registrarse primero para añadir a Carrito</h2>
+            </>
+          )}
         </div>
       </div>
 

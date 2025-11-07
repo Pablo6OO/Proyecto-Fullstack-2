@@ -1,14 +1,23 @@
 import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate } from 'react-router-dom';
+import { useAuth } from './registerUser';
 
 function Header() {
   
   const audioRef = useRef(null);
 
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+
   const handleLogoClick = () => {
     if (audioRef.current) {
       audioRef.current.play();
     }
+  };
+
+  const handleLogout = () => {
+    setUser(null); 
+    navigate('/');
   };
 
   return (
@@ -25,10 +34,25 @@ function Header() {
 
         <nav>
           <Link to="/">Inicio</Link>
-          <Link to="/login">Iniciar sesion</Link>
-          <Link to="/registro">Registro</Link>
-          <Link to="/Carrito">Carrito</Link>
-          <Link to="/aboutus">Sobre Nosotros</Link>
+          {user && <Link to="/Carrito">Carrito</Link>}
+          
+          <Link to="/AboutUs">Sobre Nosotros</Link>
+          {user ? (
+            <>
+              <button 
+                onClick={handleLogout} 
+                className="btn-logout" 
+                style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
+              >
+                Cerrar Sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">Iniciar sesion</Link>
+              <Link to="/registro">Registro</Link>
+            </>
+          )}
         </nav>
       </div>
     </header>
