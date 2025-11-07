@@ -27,28 +27,16 @@ function registro() {
       return;
     }
 
-
+    // 👇 INICIO DEL CÓDIGO A REEMPLAZAR O AGREGAR 👇
+    // 1. Crear el objeto con la información
     const newUser = {
       email: identifier,
       password: password,
-      dateRegistered: new Date().toISOString(),
-      lastLogin: null
     };
 
-
-    setUser(newUser);
-
-
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-    
-   
-    if (registeredUsers.some(user => user.email === identifier)) {
-      setErrorCorreo("Este correo ya está registrado");
-      return;
-    }
-
-    registeredUsers.push(newUser);
-    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+    // 2. Llamar a setUser con UN SOLO argumento (el objeto newUser)
+    setUser(newUser); 
+    // 👆 FIN DEL CÓDIGO A REEMPLAZAR O AGREGAR 👆
 
     alert('¡Registrado correctamente!');
 
@@ -61,32 +49,35 @@ function registro() {
         <h1>Registro de Usuario</h1>
         <form onSubmit={handleLogin} novalidate>
           <div className="form-group">
-            <label>Correo Electrónico</label>
+            <label htmlFor="email-registro">Correo Electrónico</label>
             <input type="email"
                    placeholder="Correo usuario"
                    value={identifier}
                    onChange={(e) => setIdentifier(e.target.value)}
                    required
+                   id="email-registro"
             />
             {errorCorreo && <p style={{ color: "red" }}>{errorCorreo}</p>}
           </div>
           <div className="form-group">
-            <label>Contraseña</label>
+            <label htmlFor="password-registro">Contraseña</label>
             <input type="password"
                    placeholder="Contraseña"
                    value={password}
                    onChange={(e) => setPassword(e.target.value)}
                    required
                    minlength="8"
+                   id="password-registro"
             />
           </div>
           <div className="form-group">
-            <label>Confirmar Contraseña</label>
+            <label htmlFor="confirm-password">Confirmar Contraseña</label>
             <input type="password"
                    placeholder="Repita la Contraseña"
                    value={valpass}
                    onChange={(e) => setValPass(e.target.value)}
                    required
+                   id="confirm-password"
             />
             {error && <p style={{ color: "red" }}>{error}</p>}
           </div>
