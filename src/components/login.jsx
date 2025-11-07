@@ -1,31 +1,63 @@
-import { useState } from "react"; // 👈 1. Importar useState
-import { Link , useNavigate } from 'react-router-dom';
-import { useAuth } from './registerUser'; // 👈 2. Importar useAuth
+import { useState } from "react";
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from './registerUser';
 
-function login() {
-
+function Login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [errorLogin, setErrorLogin] = useState("");
 
-  // 4. Acceder al contexto y navegación
-  const { user } = useAuth(); // Solo necesitamos leer el usuario guardado
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   
   const handleLogin = (e) => {
     e.preventDefault();
     setErrorLogin("");
 
-    // 5. Lógica de Autenticación
-    // Comprobar si hay un usuario registrado en el contexto
-    if (user && user.email === identifier && user.password === password) {
-      
-      // ¡Éxito! Las credenciales coinciden con el usuario guardado
-      alert("Inicio de sesión exitoso!");
-      navigate('/');
-      
+    if (identifier === "admin@gmail.com" && password === "DuocUc..2025") {
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('isAdmin', 'true');
+      alert("¡Bienvenido Administrador!\nAccediendo al panel de administración...");
+      navigate('/admin');
+      return;
+    }
+
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    const foundUser = registeredUsers.find(u => u.email === identifier && u.password === password);
+
+    if (foundUser) {
+      try {
+        const updatedUser = {
+          ...foundUser,
+          lastLogin: new Date().toISOString(),
+          isLoggedIn: true
+        };
+        
+        const updatedUsers = registeredUsers.map(u => 
+          u.email === updatedUser.email ? updatedUser : u
+        );
+        localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+        
+        setUser(updatedUser);
+        
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('isAdmin', 'false');
+        
+        const userName = updatedUser.email.split('@')[0];
+        const formattedName = userName.charAt(0).toUpperCase() + userName.slice(1);
+        
+        alert(`¡Bienvenido ${formattedName}! \n\nTe has conectado correctamente.\nSerás redirigido a la página de inicio.`);
+        
+        navigate('/');
+        
+        setTimeout(() => {
+          alert('¡Disfruta de tu compra en Tienda Pato Feliz! ');
+        }, 1000);
+      } catch (error) {
+        console.error('Error durante el inicio de sesión:', error);
+        setErrorLogin("Ocurrió un error durante el inicio de sesión. Por favor, intenta nuevamente.");
+      }
     } else {
-      // Fracaso: Las credenciales no coinciden o el contexto está vacío
       setErrorLogin("Credenciales inválidas. Verifica correo y contraseña.");
     }
   };
@@ -53,4 +85,4 @@ function login() {
   );
 }
 
-export default login
+export default Login;

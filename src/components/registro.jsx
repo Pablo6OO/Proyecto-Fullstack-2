@@ -27,16 +27,28 @@ function registro() {
       return;
     }
 
-    // 👇 INICIO DEL CÓDIGO A REEMPLAZAR O AGREGAR 👇
-    // 1. Crear el objeto con la información
+
     const newUser = {
       email: identifier,
       password: password,
+      dateRegistered: new Date().toISOString(),
+      lastLogin: null
     };
 
-    // 2. Llamar a setUser con UN SOLO argumento (el objeto newUser)
-    setUser(newUser); 
-    // 👆 FIN DEL CÓDIGO A REEMPLAZAR O AGREGAR 👆
+
+    setUser(newUser);
+
+
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    
+   
+    if (registeredUsers.some(user => user.email === identifier)) {
+      setErrorCorreo("Este correo ya está registrado");
+      return;
+    }
+
+    registeredUsers.push(newUser);
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
 
     alert('¡Registrado correctamente!');
 

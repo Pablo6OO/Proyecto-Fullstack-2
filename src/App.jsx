@@ -10,6 +10,7 @@ import Carrito from './components/carrito';
 import Registro from './components/registro'; 
 import Footer from './components/Footer';
 import Inicio from './components/Inicio';
+import Contact from './components/Contact';
 import ProductDetail from './components/productdetail';
 import { CartProvider } from './context/CartProvider';
 import { AuthProvider } from './components/registerUser';
@@ -30,6 +31,7 @@ function App() {
               <Route path="/carrito" element={<Carrito/>}/>
               <Route path="/" element={<Inicio/>}/>
               <Route path="/AboutUs" element={<AboutUs/>}/>
+                <Route path="/Contact" element={<Contact/>}/>
               <Route path="/producto/:id" element={<ProductDetail/>}/>  
             </Routes>
           </main>
@@ -38,7 +40,7 @@ function App() {
       </BrowserRouter>
       </CartProvider>
     </AuthProvider>
-                // Comment removed
+  
   );
 }
 

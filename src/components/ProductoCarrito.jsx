@@ -5,7 +5,6 @@ import { useCart } from '../context/CartProvider';
 function ProductoCarrito({ item }) {
   const { removeItem } = useCart();
 
-  // Calcula el subtotal para este item
   const subtotal = item.price * item.quantity;
   const subtotalFormatted = new Intl.NumberFormat('es-CL', {
     style: 'currency',
@@ -13,7 +12,7 @@ function ProductoCarrito({ item }) {
   }).format(subtotal);
 
   return (
-    <div className="cart-item"> {/* Asegúrate de tener estilos para .cart-item */}
+    <div className="cart-item"> 
       <img 
         src={`/src/images/${item.image}`} 
         alt={item.name} 
@@ -22,7 +21,7 @@ function ProductoCarrito({ item }) {
       <div className="item-details">
         <h4>{item.name}</h4>
         <p>Cantidad: {item.quantity}</p>
-        <p>Precio Unitario: {item.priceFormatted}</p> {/* Asumiendo que tiene priceFormatted */}
+        <p>Precio Unitario: {item.priceFormatted}</p> 
         <p>Subtotal: <strong>{subtotalFormatted}</strong></p>
       </div>
       <button onClick={() => removeItem(item.id)} className="btn">

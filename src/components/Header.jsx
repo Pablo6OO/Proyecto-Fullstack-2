@@ -37,6 +37,7 @@ function Header() {
           {user && <Link to="/Carrito">Carrito</Link>}
           
           <Link to="/AboutUs">Sobre Nosotros</Link>
+           <Link to="/Contact">Contacto</Link>
           {user ? (
             <>
               <button 
