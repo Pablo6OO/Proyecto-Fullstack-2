@@ -60,7 +60,7 @@ const PRODUCTS = [
     reviewRating: 0,
   },
     {
-    id: 5,
+    id: 6,
     name: "Sanduchera Eléctrica",
     price: 12000,
     priceFormatted: "$12.000",

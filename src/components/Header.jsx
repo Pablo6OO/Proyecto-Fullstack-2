@@ -43,7 +43,7 @@ function Header() {
               <button 
                 onClick={handleLogout} 
                 className="btn-logout" 
-                style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
+                style={{ backgroundColor: 'transparent', color: 'red', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
               >
                 Cerrar Sesión
               </button>
