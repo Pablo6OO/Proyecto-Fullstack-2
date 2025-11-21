@@ -13,16 +13,18 @@ import Inicio from './components/Inicio';
 import Contact from './components/Contact';
 import ProductDetail from './components/productdetail';
 import { CartProvider } from './context/CartProvider';
+import { SearchProvider } from './context/SearchContext';
 import { AuthProvider } from './components/registerUser';
 
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <div className='app-layout'></div>
-        <BrowserRouter>
-        <div>
-          <Header />
+        <SearchProvider>
+          <div className='app-layout'></div>
+          <BrowserRouter>
+          <div>
+            <Header />
           <main>
             <Routes>
               <Route path="/login" element={<Login/>}/>
@@ -38,6 +40,7 @@ function App() {
           <Footer/>
         </div>
       </BrowserRouter>
+        </SearchProvider>
       </CartProvider>
     </AuthProvider>
   

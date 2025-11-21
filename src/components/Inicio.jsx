@@ -1,6 +1,9 @@
 import React from 'react';
+import '../style.css';
 import ProductCard from './ProductCard';
 import Carrusel from './carrusel';
+import { useSearch } from '../context/SearchContext';
+
 
 const PRODUCTS = [
   {
@@ -72,21 +75,51 @@ const PRODUCTS = [
   }
 ];
 function Inicio() {
+  const { searchTerm, setSearchTerm } = useSearch();
+
+  const filtered = PRODUCTS.filter(product => {
+    if (!searchTerm || searchTerm.trim() === '') return true;
+    const q = searchTerm.toLowerCase();
+    return (
+      (product.name && product.name.toLowerCase().includes(q)) ||
+      (product.description && product.description.toLowerCase().includes(q))
+    );
+  });
+
   return (
     <div className="container">
       <section className="hero">
         <h1>Bienvenido a nuestra tienda</h1>
         <p>Productos de calidad para tu día a día.</p>
       </section>
+        {/* Buscador duplicado en Inicio (sin navegación) */}
+        <div className="search-wrapper">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Buscar productos..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+            }}
+            aria-label="Buscar productos"
+          />
+        </div>
 
-        
-        <Carrusel products={PRODUCTS} />
+        {/* Ocultar carrusel cuando hay una búsqueda activa */}
+        {(!searchTerm || searchTerm.trim() === '') && (
+          <Carrusel products={PRODUCTS} />
+        )}
  <section className="product-grid">
         <h2>Nuestros Productos</h2>
         <div className="products-container">
-          {PRODUCTS.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {filtered.length > 0 ? (
+            filtered.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          ) : (
+            <p>No se encontraron productos para "{searchTerm}"</p>
+          )}
         </div>
       </section>
 
@@ -107,30 +140,6 @@ function Inicio() {
       </section>
 
       
-      <div className="review-form">
-        <h3>Danos Tu Opinion</h3>
-        <form id="new-review-form">
-          <div className="form-group">
-            <label htmlFor="reviewer-name">Tu nombre:</label>
-            <input type="text" id="reviewer-name" name="reviewer-name" required />
-          </div>
-          <div className="form-group">
-            <label>Tu calificación:</label>
-            <div className="star-rating-input">
-              <input type="radio" id="star5" name="rating" value="5" required /><label htmlFor="star5" title="5 estrellas">&#9733;</label>
-              <input type="radio" id="star4" name="rating" value="4" /><label htmlFor="star4" title="4 estrellas">&#9733;</label>
-              <input type="radio" id="star3" name="rating" value="3" /><label htmlFor="star3" title="3 estrellas">&#9733;</label>
-              <input type="radio" id="star2" name="rating" value="2" /><label htmlFor="star2" title="2 estrellas">&#9733;</label>
-              <input type="radio" id="star1" name="rating" value="1" /><label htmlFor="star1" title="1 estrella">&#9733;</label>
-            </div>
-          </div>
-          <div className="form-group">
-            <label htmlFor="review-text">Tu comentario:</label>
-            <textarea id="review-text" name="review-text" rows="4" required></textarea>
-          </div>
-          <button type="submit" className="btn">Enviar Reseña</button>
-        </form>
-      </div>
      
     </div>
   );

@@ -1,7 +1,8 @@
+
 :root {
     --primary-color: #dbca34;
     --secondary-color: #2c3e50;
-    --background-color: #f4f7cf;
+    --background-color: #ffffff;
     --surface-color: #f8f9fa;
     --text-color: #333333;
     --light-gray-color: #cccccc;
@@ -46,6 +47,29 @@ h1, h2, h3 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
+}
+/* Search input in header */
+.search-wrapper {
+    order: 3;
+    flex: 1 1 360px;
+    display: flex;
+    justify-content: center;
+    margin: 0 0.5rem;
+}
+.search-input {
+    width: 100%;
+    max-width: 520px;
+    padding: 10px 14px;
+    border: 1px solid var(--light-gray-color);
+    border-radius: 24px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(219,202,52,0.12);
 }
 .carousel-productos {
     position: relative;
@@ -64,8 +88,10 @@ h1, h2, h3 {
     gap: 1rem;
 }
 .carousel-productos .product-card {
-    width: 320px;
+    width: auto;
+    max-width: 320px;
     margin: 0;
+    flex: 1 1 auto;
 }
 .carousel-btn {
     background: #fff;
@@ -93,14 +119,19 @@ h1, h2, h3 {
 }
 .logo-image {
     height: 50px;
-    margin-left: -970px;
+    margin-left: 150;
+    display: inline-block;
 }
 
+.header nav {
+    order: 4;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
 .header nav a {
-    margin-left: 20px;
     font-size: 1rem;
     color: var(--text-color);
-    
 }
 
 .header nav a:hover {
@@ -118,6 +149,9 @@ main {
     border-radius: var(--border-radius);
     margin-bottom: 40px;
 }
+
+
+
 
 .product-grid {
     text-align: center;
@@ -152,7 +186,8 @@ main {
 
 .product-card img {
     width: 100%;
-    height: 250px;
+    height: auto;
+    max-height: 280px;
     object-fit: cover;
     display: block;
 }
@@ -347,18 +382,6 @@ main {
     }
 }
 
-@media (max-width: 600px) {
-    .header .container {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .header nav {
-        margin-top: 10px;
-    }
-    .products-container {
-        grid-template-columns: 1fr;
-    }
-}
 .product-reviews {
     margin-top: 40px;
     padding-top: 20px;

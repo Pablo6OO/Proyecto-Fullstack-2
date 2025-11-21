@@ -26,6 +26,11 @@ return (
         </Link>
         
         <p className="product-description">{product.description}</p>
+        <p className="product-price">{product.priceFormatted ?? (product.price ? `$${(product.price/100).toFixed(2)}` : '')}</p>
+      
+      </div>
+      <div>
+
       </div>
       
       
