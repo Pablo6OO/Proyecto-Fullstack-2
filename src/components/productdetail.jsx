@@ -8,8 +8,43 @@ import { useAuth } from './registerUser';
 
 function ProductDetail() {
   const { id } = useParams();
-  const productId = parseInt(id);
-  const product = PRODUCTS.find(p => p.id === productId);
+  const paramId = id;
+  let product = null;
+
+  if (typeof paramId === 'string' && paramId.startsWith('admin-')) {
+    const parts = paramId.split('-');
+    const idx = parseInt(parts[1], 10);
+    if (!isNaN(idx)) {
+      try {
+        const stored = JSON.parse(localStorage.getItem('products')) || [];
+        const p = stored[idx];
+        if (p) {
+          product = { ...p, id: paramId, priceFormatted: p.price ? `$${Number(p.price).toLocaleString('es-CL')}` : p.priceFormatted };
+        }
+      } catch (e) {
+      }
+    }
+  }
+
+  if (!product) {
+    const numericId = parseInt(paramId, 10);
+    if (!isNaN(numericId)) {
+      product = PRODUCTS.find(p => p.id === numericId) || null;
+    }
+  }
+
+  if (!product) {
+    try {
+      const stored = JSON.parse(localStorage.getItem('products')) || [];
+      const adminProducts = stored.map((p, idx) => ({
+        ...p,
+        id: `admin-${idx}`,
+        priceFormatted: p.price ? `$${Number(p.price).toLocaleString('es-CL')}` : p.priceFormatted
+      }));
+      product = adminProducts.find(p => p.id === paramId || String(p.id) === String(paramId) || p.name === paramId) || null;
+    } catch (e) {
+    }
+  }
   const { addItem } = useCart()
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -18,7 +53,7 @@ function ProductDetail() {
     return (
       <div className="container" style={{padding: '20px'}}>
         <h1>Producto no encontrado 😥</h1>
-        <p>El producto con ID {id} no existe.</p>
+        <p>El producto con ID {paramId} no existe.</p>
         <Link to="/">Volver al inicio</Link>
       </div>
     );
@@ -35,7 +70,18 @@ function ProductDetail() {
     }
     return <div className="review-rating">{stars}</div>;
   };
-    const handleAddToCart = () => {
+
+  
+  const getProductReviews = () => {
+    try {
+      const allReviews = JSON.parse(localStorage.getItem('reviews')) || [];
+      return allReviews.filter(review => review.productId === paramId);
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const handleAddToCart = () => {
   
       addItem(product, 1);
     alert('¡Producto agregado al carrito!');
@@ -44,7 +90,21 @@ function ProductDetail() {
     <div className="container">
       <div className="product-detail">
         <div className="product-image">
-          <img src={`/src/images/${product.image}`} alt={product.name} />
+          {/* soportar imagen base64/URL o nombre de archivo en src/images */}
+          {(() => {
+            let src = '';
+            if (product.image && typeof product.image === 'string') {
+              if (product.image.startsWith('data:') || product.image.startsWith('http')) {
+                src = product.image;
+              } else {
+                src = `/src/images/${product.image}`;
+              }
+            } else {
+              
+              src = `/src/images/${product.image || 'usb.avif'}`;
+            }
+            return <img src={src} alt={product.name} onError={(e) => { e.target.onerror = null; e.target.src = '/src/images/usb.avif'; }} />;
+          })()}
         </div>
         <div className="product-info">
           <h1>{product.name}</h1>
@@ -69,23 +129,44 @@ function ProductDetail() {
 
       <section className="product-reviews">
         <h2>Valoraciones del Producto</h2>
-        {product.reviewAuthor && (
-          <div className="reviews-list" id="reviews-list">
-            <article className="review-item">
-              <div className="review-header">
-                <p className="review-author"><strong>{product.reviewAuthor}</strong></p>
-                {renderStars(product.reviewRating)}
-              </div>
-              <p className="review-comment">{product.reviewComment}</p>
-            </article>
-          </div>
-        )}
-        {!product.reviewAuthor && (
-          <p>Aún no hay reseñas para este producto.</p>
-        )}
+        {(() => {
+          const reviews = getProductReviews();
+          const allReviews = [
+            ...(product.reviewAuthor ? [{
+              id: 'default-' + product.name,
+              author: product.reviewAuthor,
+              authorName: product.reviewAuthor,
+              rating: product.reviewRating,
+              comment: product.reviewComment,
+              isDefault: true
+            }] : []),
+            ...reviews
+          ];
+          
+          return allReviews.length > 0 ? (
+            <div className="reviews-list">
+              {allReviews.map((review, idx) => (
+                <article key={idx} className="review-item">
+                  <div className="review-header">
+                    <p className="review-author">
+                      <strong>{review.authorName || review.author}</strong>
+                      {review.author && review.author.includes('@') && (
+                        <span style={{ fontSize: '0.85em', color: '#666', marginLeft: '8px' }}>({review.author})</span>
+                      )}
+                    </p>
+                    {renderStars(review.rating)}
+                  </div>
+                  <p className="review-comment">{review.comment}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p>Aún no hay reseñas para este producto.</p>
+          );
+        })()}
       </section>
 
-      <ReviewForm productId={productId} />
+      <ReviewForm productId={paramId} />
     </div>
   );
 }

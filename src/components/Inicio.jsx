@@ -2,6 +2,7 @@ import React from 'react';
 import '../style.css';
 import ProductCard from './ProductCard';
 import Carrusel from './carrusel';
+import CustomerReviews from './CustomerReviews';
 import { useSearch } from '../context/SearchContext';
 
 
@@ -76,8 +77,23 @@ const PRODUCTS = [
 ];
 function Inicio() {
   const { searchTerm, setSearchTerm } = useSearch();
+  const adminProducts = (() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('products')) || [];
+      return stored.map((p, idx) => ({
+        ...p,
+        id: `admin-${idx}`,
+        priceFormatted: `$${Number(p.price).toLocaleString('es-CL')}`,
+        image: p.image
+      }));
+    } catch {
+      return [];
+    }
+  })();
 
-  const filtered = PRODUCTS.filter(product => {
+  const allProducts = [...PRODUCTS, ...adminProducts];
+
+  const filtered = allProducts.filter(product => {
     if (!searchTerm || searchTerm.trim() === '') return true;
     const q = searchTerm.toLowerCase();
     return (
@@ -92,7 +108,6 @@ function Inicio() {
         <h1>Bienvenido a nuestra tienda</h1>
         <p>Productos de calidad para tu día a día.</p>
       </section>
-        {/* Buscador duplicado en Inicio (sin navegación) */}
         <div className="search-wrapper">
           <input
             type="search"
@@ -106,11 +121,10 @@ function Inicio() {
           />
         </div>
 
-        {/* Ocultar carrusel cuando hay una búsqueda activa */}
         {(!searchTerm || searchTerm.trim() === '') && (
-          <Carrusel products={PRODUCTS} />
+          <Carrusel products={allProducts} />
         )}
- <section className="product-grid">
+      <section className="product-grid">
         <h2>Nuestros Productos</h2>
         <div className="products-container">
           {filtered.length > 0 ? (
@@ -123,23 +137,7 @@ function Inicio() {
         </div>
       </section>
 
-
-      <section className="product-reviews">
-        <h2>Opiniones de Nuestros Clientes</h2>
-        <div className="reviews-list" id="reviews-list">
-          <article className="review-item">
-            <div className="review-header">
-              <p className="review-author"><strong>Benjamin leroy</strong></p>
-              <div className="review-rating">
-                <span className="star">&#9733;</span><span className="star">&#9733;</span><span className="star">&#9733;</span><span className="star">&#9733;</span><span className="star">&#9733;</span>
-              </div>
-            </div>
-            <p className="review-comment">Envian rapido los pedidos.</p>
-          </article>
-        </div>
-      </section>
-
-      
+      <CustomerReviews />      
      
     </div>
   );

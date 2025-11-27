@@ -17,6 +17,12 @@ function Login() {
     if (identifier === "admin@gmail.com" && password === "DuocUc..2025") {
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('isAdmin', 'true');
+      const adminUser = {
+        email: 'admin@gmail.com',
+        isAdmin: true,
+        lastLogin: new Date().toISOString()
+      };
+      setUser(adminUser);
       alert("¡Bienvenido Administrador!\nAccediendo al panel de administración...");
       navigate('/admin');
       return;

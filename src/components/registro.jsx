@@ -3,6 +3,7 @@ import { useAuth } from './registerUser';
 import { useNavigate } from "react-router-dom";
 
 function registro() {
+  const [name, setName] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [valpass, setValPass] = useState("");
@@ -27,16 +28,26 @@ function registro() {
       return;
     }
 
-    // 👇 INICIO DEL CÓDIGO A REEMPLAZAR O AGREGAR 👇
-    // 1. Crear el objeto con la información
+    
+    
     const newUser = {
       email: identifier,
       password: password,
+      name: name || identifier.split('@')[0] 
     };
 
-    // 2. Llamar a setUser con UN SOLO argumento (el objeto newUser)
+    
     setUser(newUser); 
-    // 👆 FIN DEL CÓDIGO A REEMPLAZAR O AGREGAR 👆
+    
+    
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    registeredUsers.push({
+      email: identifier,
+      name: newUser.name,
+      dateRegistered: new Date().toISOString().split('T')[0]
+    });
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+    
 
     alert('¡Registrado correctamente!');
 
@@ -48,6 +59,15 @@ function registro() {
       <section className="form-section">
         <h1>Registro de Usuario</h1>
         <form onSubmit={handleLogin} novalidate>
+          <div className="form-group">
+            <label htmlFor="name-registro">Nombre (Opcional)</label>
+            <input type="text"
+                   placeholder="Tu nombre completo"
+                   value={name}
+                   onChange={(e) => setName(e.target.value)}
+                   id="name-registro"
+            />
+          </div>
           <div className="form-group">
             <label htmlFor="email-registro">Correo Electrónico</label>
             <input type="email"

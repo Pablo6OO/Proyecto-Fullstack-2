@@ -1,12 +1,105 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './registerUser';
 import './admin.css';
 
 const Admin = () => {
     const [users, setUsers] = useState([]);
     const [cartHistory, setCartHistory] = useState([]);
     const [contactMessages, setContactMessages] = useState([]);
+    const [productForm, setProductForm] = useState({
+        name: '',
+        price: '',
+        description: '',
+        image: ''
+    });
+    const [imagePreview, setImagePreview] = useState(null);
+    const [products, setProducts] = useState([]);
+    const [editIndex, setEditIndex] = useState(null);
     const navigate = useNavigate();
+    const { setUser } = useAuth();
+
+    const handleProductFormChange = (e) => {
+        const { name, value, files } = e.target;
+        if (name === 'image' && files && files[0]) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProductForm(prev => ({ ...prev, image: reader.result }));
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(files[0]);
+        } else {
+            setProductForm(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleAddProduct = (e) => {
+        e.preventDefault();
+        if (!productForm.name || !productForm.price || !productForm.description || !productForm.image) {
+            alert('Por favor, completa todos los campos.');
+            return;
+        }
+        const pricePesos = Math.round(parseFloat(productForm.price));
+        const newProducts = [...products, { ...productForm, price: pricePesos }];
+        setProducts(newProducts);
+        localStorage.setItem('products', JSON.stringify(newProducts));
+        alert('Producto agregado correctamente.');
+        setProductForm({ name: '', price: '', description: '', image: '' });
+        setImagePreview(null);
+    };
+
+    useEffect(() => {
+        let stored = JSON.parse(localStorage.getItem('products')) || [];
+        
+        let migrated = false;
+        stored = stored.map(p => {
+            if (p && typeof p.price === 'number' && p.price > 100000 && p.price % 100 === 0) {
+                migrated = true;
+                return { ...p, price: Math.round(p.price / 100) };
+            }
+            return p;
+        });
+        if (migrated) {
+            localStorage.setItem('products', JSON.stringify(stored));
+        }
+        setProducts(stored);
+    }, []);
+
+    const handleDeleteProduct = (idx) => {
+        if (window.confirm('¿Seguro que quieres eliminar este producto?')) {
+            const newProducts = products.filter((_, i) => i !== idx);
+            setProducts(newProducts);
+            localStorage.setItem('products', JSON.stringify(newProducts));
+        }
+    };
+
+    const handleEditProduct = (idx) => {
+        setEditIndex(idx);
+        const p = products[idx];
+        setProductForm({ ...p, price: p.price ? String(p.price) : '' });
+        setImagePreview(p.image);
+    };
+
+    const handleSaveEdit = (e) => {
+        e.preventDefault();
+        if (!productForm.name || !productForm.price || !productForm.description || !productForm.image) {
+            alert('Por favor, completa todos los campos.');
+            return;
+        }
+        const pricePesos = Math.round(parseFloat(productForm.price));
+        const newProducts = products.map((p, i) => i === editIndex ? { ...productForm, price: pricePesos } : p);
+        setProducts(newProducts);
+        localStorage.setItem('products', JSON.stringify(newProducts));
+        setEditIndex(null);
+        setProductForm({ name: '', price: '', description: '', image: '' });
+        setImagePreview(null);
+    };
+
+    const handleCancelEdit = () => {
+        setEditIndex(null);
+        setProductForm({ name: '', price: '', description: '', image: '' });
+        setImagePreview(null);
+    };
 
     useEffect(() => {
         const isAdmin = localStorage.getItem('isAdmin');
@@ -43,7 +136,8 @@ const Admin = () => {
         setCartHistory(cartHistory.map(item => ({
             date: new Date(item.date).toISOString().split('T')[0],
             product: item.product,
-            price: item.price
+            price: item.price,
+            quantity: item.quantity || 1
         })));
     };
 
@@ -69,11 +163,12 @@ const Admin = () => {
     const handleLogout = () => {
         localStorage.removeItem('isAuthenticated');
         localStorage.removeItem('isAdmin');
+        setUser(null);
         navigate('/login');
     };
 
     return (
-        <div className="admin-container">
+    <div className="admin-container">
             <header className="admin-header">
                 <div className="container">
                     <h1>Tienda Pato feliz - Panel de Administración</h1>
@@ -85,6 +180,81 @@ const Admin = () => {
             </header>
 
             <main className="admin-main">
+                {/* Sección para agregar/editar productos nuevos */}
+                <section className="admin-section">
+                    <h2>{editIndex !== null ? 'Editar Producto' : 'Agregar Nuevo Producto'}</h2>
+                    <form className="admin-product-form" onSubmit={editIndex !== null ? handleSaveEdit : handleAddProduct}>
+                        <div className="form-grid">
+                            <div className="form-left">
+                                <div className="form-group">
+                                    <label>Nombre</label>
+                                    <input type="text" name="name" value={productForm.name} onChange={handleProductFormChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Precio</label>
+                                    <input type="number" name="price" value={productForm.price} onChange={handleProductFormChange} required min="0" step="0.01" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Descripción</label>
+                                    <textarea name="description" value={productForm.description} onChange={handleProductFormChange} required />
+                                </div>
+                                <div className="form-actions" style={{ marginTop: '0.5rem' }}>
+                                    {editIndex !== null ? (
+                                        <>
+                                            <button type="submit" className="btn">Guardar Cambios</button>
+                                            <button type="button" className="admin-button delete" onClick={handleCancelEdit}>Cancelar</button>
+                                        </>
+                                    ) : (
+                                        <button type="submit" className="btn">Agregar Producto</button>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="form-right">
+                                <div className="form-group">
+                                    <label>Imagen</label>
+                                    <input type="file" name="image" accept="image/*" onChange={handleProductFormChange} required={editIndex === null} />
+                                </div>
+                                <div className="image-preview" style={{ marginTop: '10px' }}>
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="Vista previa" style={{ width: '100%', borderRadius: '8px', boxShadow: 'var(--box-shadow)' }} />
+                                    ) : (
+                                        <div className="empty-preview">Vista previa de la imagen</div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <h3>Productos Agregados</h3>
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.length === 0 ? (
+                                <tr><td colSpan="5">No hay productos agregados.</td></tr>
+                            ) : (
+                                products.map((product, idx) => (
+                                    <tr key={idx}>
+                                        <td><img src={product.image} alt={product.name} style={{ maxWidth: '60px' }} /></td>
+                                        <td>{product.name}</td>
+                                        <td>${Number(product.price).toLocaleString('es-CL')}</td>
+                                        <td>{product.description}</td>
+                                        <td>
+                                            <button className="admin-button" onClick={() => handleEditProduct(idx)}>Editar</button>
+                                            <button className="admin-button delete" onClick={() => handleDeleteProduct(idx)}>Eliminar</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </section>
                 <section className="admin-section">
                     <h2>Gestión de Usuarios Registrados</h2>
                     <div className="admin-stats">

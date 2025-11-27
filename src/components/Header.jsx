@@ -2,13 +2,17 @@ import React, { useRef } from 'react';
 import { Link , useNavigate } from 'react-router-dom';
 import { useAuth } from './registerUser';
 import { useSearch } from '../context/SearchContext';
+import { useCart } from '../context/CartProvider';
 
 function Header() {
   
   const audioRef = useRef(null);
 
   const { user, setUser } = useAuth();
+  const { totalItems } = useCart();
   const navigate = useNavigate();
+
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
   const handleLogoClick = () => {
     if (audioRef.current) {
@@ -17,7 +21,8 @@ function Header() {
   };
 
   const handleLogout = () => {
-    setUser(null); 
+    setUser(null);
+    localStorage.removeItem('isAdmin');
     navigate('/');
   };
 
@@ -35,12 +40,22 @@ function Header() {
 
         <nav>
           <Link to="/">Inicio</Link>
-          {user && <Link to="/Carrito">Carrito</Link>}
+          {user && (
+            <Link to="/Carrito" className="cart-link">
+              Carrito
+              {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
+            </Link>
+          )}
           
           <Link to="/AboutUs">Sobre Nosotros</Link>
-           <Link to="/Contact">Contacto</Link>
+          <Link to="/Contact">Contacto</Link>
           {user ? (
             <>
+              {isAdmin && (
+                <Link to="/admin" className="btn-admin">
+                  Panel Admin
+                </Link>
+              )}
               <button 
                 onClick={handleLogout} 
                 className="btn-logout" 

@@ -23,7 +23,7 @@ const Carrusel = ({ products }) => {
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
 
-	// Ensure current is within bounds when itemsPerView or products change
+	
 	useEffect(() => {
 		const total = products.length;
 		const maxIndex = Math.max(0, total - itemsPerView);
