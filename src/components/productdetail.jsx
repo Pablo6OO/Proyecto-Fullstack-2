@@ -1,53 +1,62 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link , useNavigate } from 'react-router-dom';
 import { PRODUCTS } from './Inicio';
-import carrito from './carrito';
 import ReviewForm from './ReviewForm';
 import { useCart } from '../context/CartProvider';
 import { useAuth } from './registerUser';
+import ProductService from '../services/productService';
+import ReviewService from '../services/reviewService';
 
 function ProductDetail() {
   const { id } = useParams();
   const paramId = id;
-  let product = null;
+  const [product, setProduct] = useState(null);
+  const [productReviews, setProductReviews] = useState([]);
 
-  if (typeof paramId === 'string' && paramId.startsWith('admin-')) {
-    const parts = paramId.split('-');
-    const idx = parseInt(parts[1], 10);
-    if (!isNaN(idx)) {
-      try {
-        const stored = JSON.parse(localStorage.getItem('products')) || [];
-        const p = stored[idx];
-        if (p) {
-          product = { ...p, id: paramId, priceFormatted: p.price ? `$${Number(p.price).toLocaleString('es-CL')}` : p.priceFormatted };
-        }
-      } catch (e) {
-      }
-    }
-  }
-
-  if (!product) {
-    const numericId = parseInt(paramId, 10);
-    if (!isNaN(numericId)) {
-      product = PRODUCTS.find(p => p.id === numericId) || null;
-    }
-  }
-
-  if (!product) {
-    try {
-      const stored = JSON.parse(localStorage.getItem('products')) || [];
-      const adminProducts = stored.map((p, idx) => ({
-        ...p,
-        id: `admin-${idx}`,
-        priceFormatted: p.price ? `$${Number(p.price).toLocaleString('es-CL')}` : p.priceFormatted
-      }));
-      product = adminProducts.find(p => p.id === paramId || String(p.id) === String(paramId) || p.name === paramId) || null;
-    } catch (e) {
-    }
-  }
   const { addItem } = useCart()
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let mounted = true;
+    const numericId = parseInt(paramId, 10);
+
+    const loadProduct = async () => {
+      if (!isNaN(numericId)) {
+        try {
+          const p = await ProductService.getById(numericId);
+          if (mounted) setProduct({
+            id: p.id,
+            name: p.name || p.title || 'Sin nombre',
+            price: p.price || 0,
+            priceFormatted: p.price ? `$${Number(p.price).toLocaleString('es-CL')}` : '$0',
+            description: p.description || p.category || '',
+            image: p.image || 'placeholder.jpg'
+          });
+        } catch (e) {
+          // fallback to static
+          const staticP = PRODUCTS.find(pp => pp.id === numericId) || null;
+          if (mounted) setProduct(staticP);
+        }
+      } else {
+        // non-numeric id: try static products
+        const staticP = PRODUCTS.find(p => p.id === paramId || p.name === paramId) || null;
+        if (mounted) setProduct(staticP);
+      }
+
+      // load reviews for this product
+      try {
+        const all = await ReviewService.getAll();
+        const filtered = (all || []).filter(r => String(r.productId) === String(paramId) || String(r.productId) === String(numericId));
+        if (mounted) setProductReviews(filtered);
+      } catch (err) {
+        console.error('Error fetching reviews for product:', err);
+      }
+    };
+
+    loadProduct();
+    return () => { mounted = false; };
+  }, [paramId]);
 
   if (!product) {
     return (
@@ -73,12 +82,7 @@ function ProductDetail() {
 
   
   const getProductReviews = () => {
-    try {
-      const allReviews = JSON.parse(localStorage.getItem('reviews')) || [];
-      return allReviews.filter(review => review.productId === paramId);
-    } catch (e) {
-      return [];
-    }
+    return productReviews || [];
   };
 
   const handleAddToCart = () => {

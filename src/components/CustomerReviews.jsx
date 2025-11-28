@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import ReviewService from '../services/reviewService';
 
 function CustomerReviews() {
   const [displayedReviews, setDisplayedReviews] = useState([]);
 
   useEffect(() => {
-    
-    const allReviews = JSON.parse(localStorage.getItem('reviews')) || [];
-    
-    if (allReviews.length === 0) {
-      
-      setDisplayedReviews([
+    // obtener reseñas desde backend
+    ReviewService.getAll().then(allReviews => {
+      if (!allReviews || allReviews.length === 0) {
+        setDisplayedReviews([
         {
           authorName: 'María González',
           author: 'maria@gmail.com',
@@ -32,11 +31,13 @@ function CustomerReviews() {
           productId: 'default-3'
         }
       ]);
-    } else {
-      
-      const shuffled = [...allReviews].sort(() => Math.random() - 0.5);
-      setDisplayedReviews(shuffled.slice(0, 3));
-    }
+      } else {
+        const shuffled = [...allReviews].sort(() => Math.random() - 0.5);
+        setDisplayedReviews(shuffled.slice(0, 3));
+      }
+    }).catch(err => {
+      console.error('Error fetching reviews:', err);
+    });
   }, []);
 
   const renderStars = (rating) => {

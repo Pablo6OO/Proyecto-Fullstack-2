@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './registerUser';
+import ReviewService from '../services/reviewService';
 
 function ReviewForm({ productId }) {
   const [formData, setFormData] = useState({
@@ -31,33 +32,25 @@ function ReviewForm({ productId }) {
     }
 
     
-    const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
-    
-    
     const newReview = {
-      id: `review-${Date.now()}`,
-      productId: productId,
-      author: user.email, 
-      authorName: user.name || user.email.split('@')[0], 
+      productId: String(productId),
+      author: user.email,
+      authorName: user.name || user.email.split('@')[0],
       rating: parseInt(formData.rating, 10),
       comment: formData.comment,
       date: new Date().toISOString()
     };
 
-    
-    reviews.push(newReview);
-    localStorage.setItem('reviews', JSON.stringify(reviews));
-
-    
-    setSubmitted(true);
-    setFormData({ rating: '', comment: '' });
-    
-    setTimeout(() => {
-      setSubmitted(false);
-    }, 3000);
-
-    
-    window.location.reload();
+    ReviewService.create(newReview).then(() => {
+      setSubmitted(true);
+      setFormData({ rating: '', comment: '' });
+      setTimeout(() => setSubmitted(false), 3000);
+      // Recargar la página para simplificar la actualización de reseñas
+      window.location.reload();
+    }).catch(err => {
+      console.error('Error saving review:', err);
+      alert('Ocurrió un error al enviar la reseña. Intenta nuevamente.');
+    });
   };
 
   if (!user) {

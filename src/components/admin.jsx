@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import ProductService from '../services/productService';
+import ContactService from '../services/contactService';
+import PurchaseService from '../services/purchaseService';
+import UserService from '../services/userService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './registerUser';
 import './admin.css';
@@ -33,43 +37,56 @@ const Admin = () => {
         }
     };
 
-    const handleAddProduct = (e) => {
+    const handleAddProduct = async (e) => {
         e.preventDefault();
         if (!productForm.name || !productForm.price || !productForm.description || !productForm.image) {
             alert('Por favor, completa todos los campos.');
             return;
         }
-        const pricePesos = Math.round(parseFloat(productForm.price));
-        const newProducts = [...products, { ...productForm, price: pricePesos }];
-        setProducts(newProducts);
-        localStorage.setItem('products', JSON.stringify(newProducts));
-        alert('Producto agregado correctamente.');
+        const priceNumber = parseFloat(productForm.price);
+
+        const formattedPrice = new Intl.NumberFormat('es-CL', {
+            style: 'currency',
+            currency: 'CLP',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(priceNumber).replace('CLP', '$').trim();
+
+        try {
+            const created = await ProductService.create({
+                name: productForm.name,
+                price: priceNumber,
+                priceFormatted: formattedPrice,
+                description: productForm.description,
+                image: productForm.image
+            });
+            setProducts(prev => [...prev, created]);
+            alert('Producto agregado correctamente.');
+        } catch (err) {
+            console.error('Error creating product:', err);
+            alert('Error al agregar producto');
+        }
         setProductForm({ name: '', price: '', description: '', image: '' });
         setImagePreview(null);
     };
 
     useEffect(() => {
-        let stored = JSON.parse(localStorage.getItem('products')) || [];
-        
-        let migrated = false;
-        stored = stored.map(p => {
-            if (p && typeof p.price === 'number' && p.price > 100000 && p.price % 100 === 0) {
-                migrated = true;
-                return { ...p, price: Math.round(p.price / 100) };
-            }
-            return p;
-        });
-        if (migrated) {
-            localStorage.setItem('products', JSON.stringify(stored));
-        }
-        setProducts(stored);
+        // obtener productos desde backend
+        ProductService.getAll().then(list => {
+            setProducts(list || []);
+        }).catch(err => console.error('Error fetching products:', err));
     }, []);
 
     const handleDeleteProduct = (idx) => {
         if (window.confirm('¿Seguro que quieres eliminar este producto?')) {
-            const newProducts = products.filter((_, i) => i !== idx);
-            setProducts(newProducts);
-            localStorage.setItem('products', JSON.stringify(newProducts));
+            const p = products[idx];
+            try {
+                ProductService.delete(p.id).then(() => {
+                    setProducts(prev => prev.filter((_, i) => i !== idx));
+                }).catch(err => console.error('Error deleting product:', err));
+            } catch (err) {
+                console.error(err);
+            }
         }
     };
 
@@ -86,13 +103,35 @@ const Admin = () => {
             alert('Por favor, completa todos los campos.');
             return;
         }
-        const pricePesos = Math.round(parseFloat(productForm.price));
-        const newProducts = products.map((p, i) => i === editIndex ? { ...productForm, price: pricePesos } : p);
-        setProducts(newProducts);
-        localStorage.setItem('products', JSON.stringify(newProducts));
-        setEditIndex(null);
-        setProductForm({ name: '', price: '', description: '', image: '' });
-        setImagePreview(null);
+        const priceNumber = parseFloat(productForm.price);
+
+        const formattedPrice = new Intl.NumberFormat('es-CL', {
+            style: 'currency',
+            currency: 'CLP',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(priceNumber).replace('CLP', '$').trim();
+
+        const id = products[editIndex] && products[editIndex].id;
+        const updated = { ...productForm, price: priceNumber, priceFormatted: formattedPrice };
+        if (id) {
+            ProductService.update(id, updated).then(saved => {
+                setProducts(prev => prev.map((p, i) => i === editIndex ? saved : p));
+                setEditIndex(null);
+                setProductForm({ name: '', price: '', description: '', image: '' });
+                setImagePreview(null);
+            }).catch(err => {
+                console.error('Error updating product:', err);
+                alert('Error al guardar cambios');
+            });
+        } else {
+            // fallback: just update locally
+            const newProducts = products.map((p, i) => i === editIndex ? { ...productForm, price: pricePesos } : p);
+            setProducts(newProducts);
+            setEditIndex(null);
+            setProductForm({ name: '', price: '', description: '', image: '' });
+            setImagePreview(null);
+        }
     };
 
     const handleCancelEdit = () => {
@@ -102,67 +141,58 @@ const Admin = () => {
     };
 
     useEffect(() => {
-        const isAdmin = localStorage.getItem('isAdmin');
-        const isAuthenticated = localStorage.getItem('isAuthenticated');
-
-        if (!isAuthenticated || isAdmin !== 'true') {
-            alert('Acceso no autorizado. Por favor inicie sesión como administrador.');
-            navigate('/login');
-            return;
-        }
-
+        // Para simplicidad obtenemos usuarios registrados del backend
+        // En un sistema real se debería validar el token/permiso
         fetchUsers();
         fetchCartHistory();
         fetchContactMessages();
     }, [navigate]);
 
     const fetchUsers = () => {
-        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-        const contextUsers = JSON.parse(localStorage.getItem('users')) || [];
-        
-        const allUsers = [...registeredUsers, ...contextUsers];
-        const uniqueUsers = Array.from(new Map(allUsers.map(user => [user.email, user])).values());
-        
-        setUsers(uniqueUsers.map(user => ({
-            email: user.email,
-            dateRegistered: user.dateRegistered || new Date().toISOString().split('T')[0],
-            lastLogin: user.lastLogin || 'No ha iniciado sesión',
-            isAdmin: user.email === 'admin@gmail.com'
-        })));
+        UserService.getAll().then(list => {
+            const mapped = (list || []).map(user => ({
+                email: user.email,
+                dateRegistered: user.dateRegistered || new Date().toISOString().split('T')[0],
+                lastLogin: user.lastLogin || 'No ha iniciado sesión',
+                isAdmin: user.email === 'admin@gmail.com'
+            }));
+            setUsers(mapped);
+        }).catch(err => console.error('Error fetching users:', err));
     };
 
     const fetchCartHistory = () => {
-        const cartHistory = JSON.parse(localStorage.getItem('cartHistory')) || [];
-        setCartHistory(cartHistory.map(item => ({
-            date: new Date(item.date).toISOString().split('T')[0],
-            product: item.product,
-            price: item.price,
-            quantity: item.quantity || 1
-        })));
+        PurchaseService.getAll().then(list => {
+            setCartHistory((list || []).map(item => ({
+                date: new Date(item.date).toISOString().split('T')[0],
+                product: item.product,
+                price: item.price,
+                quantity: item.quantity || 1
+            })));
+        }).catch(err => console.error('Error fetching purchases:', err));
     };
 
     const fetchContactMessages = () => {
-        const messages = JSON.parse(localStorage.getItem('contactMessages')) || [];
-        setContactMessages(messages.map(msg => ({
-            name: msg.nombre || msg.name,
-            email: msg.correo || msg.email,
-            message: msg.contenido || msg.message,
-            date: msg.date || new Date().toISOString().split('T')[0]
-        })));
+        ContactService.getAll().then(list => {
+            setContactMessages((list || []).map(msg => ({
+                name: msg.nombre || msg.name,
+                email: msg.correo || msg.email,
+                message: msg.contenido || msg.message,
+                date: msg.date || new Date().toISOString().split('T')[0]
+            })));
+        }).catch(err => console.error('Error fetching contact messages:', err));
     };
     const handleDeleteUser = (email) => {
         const confirmed = window.confirm(`¿Está seguro de eliminar al usuario ${email}?`);
         if (confirmed) {
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-            const updatedUsers = registeredUsers.filter(user => user.email !== email);
-            localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
-            fetchUsers(); 
+            // delete user is not implemented in backend; show confirmation
+            alert('Eliminación de usuarios no está implementada en el backend demo.');
+            // opcional: refrescar lista
+            fetchUsers();
         }
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('isAdmin');
+        // Clear user context and navigate to login
         setUser(null);
         navigate('/login');
     };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ContactService from '../services/contactService';
 
 function Contact({ onClose }) {
   const [nombre, setNombre] = useState('');
@@ -20,9 +21,8 @@ function Contact({ onClose }) {
     };
 
 
-    const existingMessages = JSON.parse(localStorage.getItem('contactMessages')) || [];
-    existingMessages.push(newMessage);
-    localStorage.setItem('contactMessages', JSON.stringify(existingMessages));
+  // Guardar en backend
+  ContactService.create(newMessage).catch(err => console.error('Error saving contact message:', err));
 
    
     setSuccess(true);

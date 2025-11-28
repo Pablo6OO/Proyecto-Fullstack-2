@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './registerUser';
+import UserService from '../services/userService';
 
 function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -14,9 +15,8 @@ function Login() {
     e.preventDefault();
     setErrorLogin("");
 
+    // Authenticate admin hardcoded case
     if (identifier === "admin@gmail.com" && password === "DuocUc..2025") {
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('isAdmin', 'true');
       const adminUser = {
         email: 'admin@gmail.com',
         isAdmin: true,
@@ -28,44 +28,21 @@ function Login() {
       return;
     }
 
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-    const foundUser = registeredUsers.find(u => u.email === identifier && u.password === password);
-
-    if (foundUser) {
-      try {
-        const updatedUser = {
-          ...foundUser,
-          lastLogin: new Date().toISOString(),
-          isLoggedIn: true
-        };
-        
-        const updatedUsers = registeredUsers.map(u => 
-          u.email === updatedUser.email ? updatedUser : u
-        );
-        localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
-        
+    // Buscar usuario en backend
+    UserService.getAll().then(list => {
+      const foundUser = (list || []).find(u => u.email === identifier && u.password === password);
+      if (foundUser) {
+        const updatedUser = { ...foundUser, lastLogin: new Date().toISOString(), isLoggedIn: true };
         setUser(updatedUser);
-        
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('isAdmin', 'false');
-        
-        const userName = updatedUser.email.split('@')[0];
-        const formattedName = userName.charAt(0).toUpperCase() + userName.slice(1);
-        
-        alert(`¡Bienvenido ${formattedName}! \n\nTe has conectado correctamente.\nSerás redirigido a la página de inicio.`);
-        
+        alert(`¡Bienvenido ${updatedUser.email.split('@')[0]}!\nTe has conectado correctamente.`);
         navigate('/');
-        
-        setTimeout(() => {
-          alert('¡Disfruta de tu compra en Tienda Pato Feliz! ');
-        }, 1000);
-      } catch (error) {
-        console.error('Error durante el inicio de sesión:', error);
-        setErrorLogin("Ocurrió un error durante el inicio de sesión. Por favor, intenta nuevamente.");
+      } else {
+        setErrorLogin("Credenciales inválidas. Verifica correo y contraseña.");
       }
-    } else {
-      setErrorLogin("Credenciales inválidas. Verifica correo y contraseña.");
-    }
+    }).catch(err => {
+      console.error('Error fetching users for login:', err);
+      setErrorLogin('Ocurrió un error durante el inicio de sesión. Intenta nuevamente.');
+    });
   };
 
   return (

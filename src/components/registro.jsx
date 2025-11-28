@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from './registerUser';
 import { useNavigate } from "react-router-dom";
+import UserService from '../services/userService';
 
 function registro() {
   const [name, setName] = useState("");
@@ -33,25 +34,21 @@ function registro() {
     const newUser = {
       email: identifier,
       password: password,
-      name: name || identifier.split('@')[0] 
+      name: name || identifier.split('@')[0]
     };
 
-    
-    setUser(newUser); 
-    
-    
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-    registeredUsers.push({
-      email: identifier,
-      name: newUser.name,
-      dateRegistered: new Date().toISOString().split('T')[0]
-    });
-    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-    
-
-    alert('¡Registrado correctamente!');
-
-    navigate('/');
+    try {
+      UserService.create(newUser).then(created => {
+        setUser(created);
+        alert('¡Registrado correctamente!');
+        navigate('/');
+      }).catch(err => {
+        console.error('Error creating user:', err);
+        alert('Error al registrar usuario');
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

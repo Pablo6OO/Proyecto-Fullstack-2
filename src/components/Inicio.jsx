@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../style.css';
 import ProductCard from './ProductCard';
 import Carrusel from './carrusel';
 import CustomerReviews from './CustomerReviews';
 import { useSearch } from '../context/SearchContext';
+import ProductService from '../services/productService';
 
 
 const PRODUCTS = [
@@ -142,23 +143,39 @@ const PRODUCTS = [
 ];
 function Inicio() {
   const { searchTerm, setSearchTerm } = useSearch();
-  const adminProducts = (() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('products')) || [];
-      return stored.map((p, idx) => ({
-        ...p,
-        id: `admin-${idx}`,
-        priceFormatted: `$${Number(p.price).toLocaleString('es-CL')}`,
-        image: p.image
-      }));
-    } catch {
-      return [];
-    }
-  })();
+  const [backendProducts, setBackendProducts] = useState([]);
+  const [backendLoaded, setBackendLoaded] = useState(false);
+  const allProducts = [...PRODUCTS];
 
-  const allProducts = [...PRODUCTS, ...adminProducts];
+  // If backend provides products, merge them (backend products take precedence)
+  useEffect(() => {
+    let mounted = true;
+    ProductService.getAll()
+      .then((data) => {
+        if (!mounted) return;
+        // map backend Product shape to the UI-friendly shape used here
+        const mapped = (Array.isArray(data) ? data : []).map((p) => ({
+          id: p.id,
+          name: p.name || p.title || 'Sin nombre',
+          price: p.price || 0,
+          priceFormatted: p.price ? `$${Number(p.price).toLocaleString('es-CL')}` : '$0',
+          description: p.description || p.category || '',
+          image: p.image || 'placeholder.jpg',
+        }));
+        setBackendProducts(mapped);
+      })
+      .catch(() => {
+        // Silently ignore; fallback to static products
+        setBackendProducts([]);
+      })
+      .finally(() => setBackendLoaded(true));
 
-  const filtered = allProducts.filter(product => {
+    return () => { mounted = false; };
+  }, []);
+
+  const mergedProducts = backendProducts.length > 0 ? [...backendProducts, ...allProducts] : allProducts;
+
+  const filtered = mergedProducts.filter(product => {
     if (!searchTerm || searchTerm.trim() === '') return true;
     const q = searchTerm.toLowerCase();
     return (

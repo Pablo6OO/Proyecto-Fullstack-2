@@ -2,32 +2,28 @@ import React from 'react';
 import { useCart } from '../context/CartProvider'; 
 import ProductoCarrito from './ProductoCarrito';  
 import { Link } from 'react-router-dom';
+import PurchaseService from '../services/purchaseService';
 
 function Carrito() {
   const { cart, clearCart, totalPriceFormatted, totalItems } = useCart();
   
   const handleFinishPurchase = () => {
- 
-    const cartHistory = JSON.parse(localStorage.getItem('cartHistory')) || [];
-    
-
-    cart.forEach(item => {
-      cartHistory.push({
+    // Enviar cada item como compra al backend
+    Promise.all(cart.map(item => {
+      const purchase = {
         date: new Date().toISOString(),
         product: item.name || item.title,
-        price: item.price,
-        quantity: item.quantity
-      });
+        price: Number(item.price),
+        quantity: item.quantity || 1
+      };
+      return PurchaseService.create(purchase);
+    })).then(() => {
+      clearCart();
+      alert('¡Compra realizada con éxito!');
+    }).catch(err => {
+      console.error('Error saving purchases:', err);
+      alert('Ocurrió un error al guardar la compra. Intenta nuevamente.');
     });
-    
-
-    localStorage.setItem('cartHistory', JSON.stringify(cartHistory));
-    
-
-    clearCart();
-    
-
-    alert('¡Compra realizada con éxito!');
   };
 
   

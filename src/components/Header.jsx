@@ -12,7 +12,7 @@ function Header() {
   const { totalItems } = useCart();
   const navigate = useNavigate();
 
-  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+  const isAdmin = user && user.isAdmin === true;
 
   const handleLogoClick = () => {
     if (audioRef.current) {
@@ -22,7 +22,7 @@ function Header() {
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem('isAdmin');
+    // No localStorage use anymore; clear user in context
     navigate('/');
   };
 
