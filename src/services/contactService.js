@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const BASE = import.meta.env.VITE_API_BASE_URL || 'http://ec2-52-206-191-212.compute-1.amazonaws.com:8080/api';
 const CONTACTS_URL = `${BASE}/contactMessages`;
 
 async function handleResponse(res) {
